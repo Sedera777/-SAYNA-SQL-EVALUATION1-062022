@@ -156,3 +156,23 @@ INSERT INTO emprunter VALUES
 (31,from_days(to_days(current_date)-1),14, NULL,20),
 (21,from_days(to_days(current_date)-1),14, NULL,20),
 (32,from_days(to_days(current_date)-1),14, NULL,20);
+
+INSERT INTO adherents VALUES 
+(31, 'Olivier','DUPOND','76, quai de la Loire, 75019 Paris','0102030405');
+
+INSERT INTO emprunter VALUES
+(31, '2022-06-28', 14, NULL, 7);
+
+INSERT INTO emprunter VALUES
+(23, '2022-06-28', 14, NULL, 7);
+
+UPDATE emprunter SET DateRet='2022-06-28' WHERE NA=28;
+
+INSERT INTO emprunter VALUES
+(23, '2022-06-28', 14, NULL, 28);
+
+INSERT INTO emprunter VALUES
+(29, '2022-06-28', 14, NULL, 28);
+
+UPDATE `biblio`.`emprunter` SET `dateRet` = '' WHERE (`NL` = '26') and (`dateEmp` = '2021-08-16');
+UPDATE `biblio`.`emprunter` SET `dateRet` = '' WHERE (`NL` = '12') and (`dateEmp` = '2021-08-31');
