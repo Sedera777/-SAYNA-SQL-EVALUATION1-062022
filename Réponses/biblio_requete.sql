@@ -10,20 +10,12 @@ de création des tables (création de la table œuvres puis création de la tabl
 alors j'ai aussi inversé l'ordre de création des tables (création de la table adhérents
 puis création de la table emprunter après)
 3-Nombre de tuples de la table œuvres après le script de création des tables et des tuples :*/
- SELECT count(*) FROM biblio.oeuvres;
-# 4-Nombres d’attributs de la table:
- DESCRIBE biblio.oeuvres;
- # (5 rows returned)
-# 5-Clé primaire de la table :
-# NO integer primary key auto_increment,
-/*6- Nombre de tuples de la table adhérents après le script de création des tables et des
-tuples :*/
- SELECT count(*) FROM biblio.adherents;
-# 7- Nombres d’attributs de la table:
- DESCRIBE biblio.adherents;
-# (5 rows returned)
-# 8-Clé primaire de la table :
-# NA INT PRIMARY KEY AUTO_INCREMENT,
+SELECT (SELECT COUNT(*) FROM biblio.oeuvres)+
+ (SELECT COUNT(*) FROM biblio.livres)+
+ (SELECT COUNT(*) FROM biblio.adherents)+
+ (SELECT COUNT(*) FROM biblio.emprunter)
+AS 'Nb Total de Tuples';
+
 # V.2 - Interactions avec la base de données
 # 9. Livres actuellement empruntés :
 SELECT emprunter.NL, editeur, livres.NO
@@ -73,10 +65,12 @@ SELECT titre, auteur FROM biblio.oeuvres WHERE titre = 'Voyage au bout de la nui
 SELECT DISTINCT editeur, titre FROM biblio.livres, biblio.oeuvres
 WHERE titre = 'Narcisse et Goldmund' AND livres.NO = oeuvres.NO;
 # 20. Les adhérents actuellement en retard :
-SELECT emprunter.NA, prenom, nom, dateEmp, dureeMax, dateRet FROM
-biblio.emprunter, biblio.adherents WHERE emprunter.NA = adherents.NA
-AND DATEDIFF(NOW(), DATE_ADD(dateEmp, INTERVAL dureeMax day)) > dureeMax
-AND (dateRet IS NULL OR dateRet='0000-00-00');
+SELECT emprunter.NA, prenom, nom, count(NL) AS 'Nombre de livre(s) en retard', 
+AVG((CASE WHEN (dateRet IS NULL OR dateRet='0000-00-00') THEN DATEDIFF(NOW(), DATE_ADD(dateEmp, INTERVAL dureeMax day))-dureeMax
+ELSE datediff(DateRet, DateEmp)-dureeMax END)) AS 'Moyenne du nombre de jour(s) de retard'
+FROM biblio.emprunter, biblio.adherents
+WHERE (CASE WHEN (dateRet IS NULL OR dateRet='0000-00-00') THEN DATEDIFF(NOW(), DATE_ADD(dateEmp, INTERVAL dureeMax day)) > dureeMax
+ELSE datediff(DateRet, DateEmp) > dureeMax END) AND emprunter.NA = adherents.NA GROUP BY NA;
 # 21. Les livres actuellement en retard :
 SELECT emprunter.NL, editeur, livres.NO
 FROM biblio.emprunter, biblio.adherents, biblio.livres
